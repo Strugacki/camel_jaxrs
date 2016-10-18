@@ -1,1 +1,5 @@
 com\mhallman\camel_jaxrs\service\PersonService.class
+com\mhallman\camel_jaxrs\domain\Person.class
+com\mhallman\camel_jaxrs\repository\PersonRepositoryImpl.class
+com\mhallman\camel_jaxrs\repository\PersonRepository.class
+com\mhallman\camel_jaxrs\route\PersonRoute.class

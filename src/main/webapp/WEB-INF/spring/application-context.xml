@@ -9,8 +9,8 @@
 		http://www.springframework.org/schema/context/spring-context-3.0.xsd
 	http://camel.apache.org/schema/spring 
 		http://camel.apache.org/schema/spring/camel-spring.xsd
-	http://cxf.apache.org/core
-		http://cxf.apache.org/schemas/core.xsd 
+	http://camel.apache.org/schema/cxf 
+		http://camel.apache.org/schema/cxf/camel-cxf.xsd
 	http://cxf.apache.org/jaxrs 
 		http://cxf.apache.org/schemas/jaxrs.xsd">
 
@@ -18,21 +18,49 @@
  	<import resource="classpath:META-INF/cxf/cxf-servlet.xml" />
 	<import resource="classpath:META-INF/cxf/cxf-extension-jaxrs-binding.xml" />
 	<import resource="classpath:META-INF/cxf/cxf-extension-http-jetty.xml" />
+	
+	<!-- ADDING JMS_CONTEXT FILE -->
+	<import resource="jms-context.xml" />
 
-
+	<!-- SCANS PACKAGE IN ORDER TO CREATE BEANS FROM COMPONENT ANNOTATED CLASSES -->
 	<context:component-scan base-package="com.mhallman.camel_jaxrs.service"></context:component-scan>
+	
+	<!-- DUE TO AUTOWIRIND PERSONREPOSITORY INTERFACE INTO SERVICE WE NEED TO CREATE BEAN WITH IMPLEMENTATION OF SERVICE -->
     <bean id="personRepository" class="com.mhallman.camel_jaxrs.repository.PersonRepositoryImpl" />
 	<!-- <bean id="personService" class="com.mhallman.camel_jaxrs.service.PersonService">
 		<property name="personRepository" ref="personRepository"></property>
 	</bean>!-->
-
-	<!-- ><jaxrs:server id="myserver" address="http://localhost:8080/camel_jaxrs/rest">
+	
+	<!-- CREATE BEAN FROM PERSONROUTE CLASS THAT EXTENDS ROUTEBUILDER -->
+	<bean id="personRoute" class="com.mhallman.camel_jaxrs.route.PersonRoute" />
+	<bean id="personRoute2" class="com.mhallman.camel_jaxrs.route.PersonRoute2" />
+	<!-- <bean id="jsonProvider" class="org.apache.cxf.jaxrs.provider.json.JSONProvider"/>!-->
+	
+	<jaxrs:server id="myserver" address="http://localhost:8085/camel_jaxrs/rest">
 		<jaxrs:serviceBeans>
 			<ref bean="personService" />
 		</jaxrs:serviceBeans>
-		<jaxrs:providers>
-			<ref bean="jsonProvider" />
-		</jaxrs:providers>
-	</jaxrs:server>!-->
+	</jaxrs:server>
+	
+	<cxf:rsServer id="rsServer" address="http://localhost:8086/camel_jaxrs/rest/person/create" serviceClass="com.mhallman.camel_jaxrs.service.PersonService"  ></cxf:rsServer>
+	
+	<cxf:rsClient id="rsClient" address="http://localhost:8087/camel_jaxrs/rest/person/createpost" serviceClass="com.mhallman.camel_jaxrs.service.PersonService"></cxf:rsClient>
+	
+	
+	<camelContext xmlns="http://camel.apache.org/schema/spring">
+		<routeBuilder ref="personRoute" />
+		<route>
+			<from uri="jms:incomingTxtFiles" />
+			<to uri="file:D:/camel/output" />
+		</route>
+		<route>
+       <!-- Just need to ignoreDeleteMethodMessageBody -->
+       <from uri="cxfrs://bean://rsServer"/>
+	       <to uri="log:body?level=INFO"/>
+	       <to uri="cxfrs://bean://rsClient?ignoreDeleteMethodMessageBody=true"/>
+	    </route>
+	</camelContext>
+	
+	
 
 </beans>
