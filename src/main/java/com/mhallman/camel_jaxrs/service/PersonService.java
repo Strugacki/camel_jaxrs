@@ -22,16 +22,6 @@ public class PersonService {
 
 	@Autowired
 	private PersonRepository personRepository;
-	
-	/*public PersonRepository getPersonRepository() {
-		return personRepository;
-	}
-
-
-	public void setPersonRepository(PersonRepository personRepository) {
-		this.personRepository = personRepository;
-	}*/
-
 
 	@POST
 	@Path("/createpost")
@@ -46,6 +36,15 @@ public class PersonService {
 	@Path("/create")
 	@Produces(MediaType.APPLICATION_JSON)
 	public Person getPerson(){
-		return personRepository.create();
+		Person newPerson = personRepository.create();
+		return newPerson;
+	}
+	
+	
+	@GET
+	@Path("/camel/{id}")
+	@Produces(MediaType.APPLICATION_JSON)
+	public Response camelRoute(@PathParam("id") long id){
+		return null;
 	}
 }

@@ -31,6 +31,12 @@
     </dependency>
     
     <dependency>
+        <groupId>org.apache.camel</groupId>
+        <artifactId>camel-jackson</artifactId>
+        <version>${camel.version}</version>
+    </dependency>
+    
+    <dependency>
     	<groupId>org.apache.camel</groupId>
     	<artifactId>camel-jms</artifactId>
     	<version>${camel.version}</version>
@@ -41,6 +47,14 @@
     	<artifactId>activemq-core</artifactId>
     	<version>5.3.2</version>
     </dependency>
+    
+    <!-- https://mvnrepository.com/artifact/org.codehaus.jackson/jackson-mapper-asl -->
+	<dependency>
+	    <groupId>org.codehaus.jackson</groupId>
+	    <artifactId>jackson-mapper-asl</artifactId>
+	    <version>1.7.1</version>
+	</dependency>
+    
     
     
     <dependency>

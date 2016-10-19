@@ -18,34 +18,31 @@
  	<import resource="classpath:META-INF/cxf/cxf-servlet.xml" />
 	<import resource="classpath:META-INF/cxf/cxf-extension-jaxrs-binding.xml" />
 	<import resource="classpath:META-INF/cxf/cxf-extension-http-jetty.xml" />
-	
 	<!-- ADDING JMS_CONTEXT FILE -->
 	<import resource="jms-context.xml" />
 
 	<!-- SCANS PACKAGE IN ORDER TO CREATE BEANS FROM COMPONENT ANNOTATED CLASSES -->
 	<context:component-scan base-package="com.mhallman.camel_jaxrs.service"></context:component-scan>
+	<context:component-scan base-package="com.mhallman.camel_jaxrs.repository"></context:component-scan>
 	
 	<!-- DUE TO AUTOWIRIND PERSONREPOSITORY INTERFACE INTO SERVICE WE NEED TO CREATE BEAN WITH IMPLEMENTATION OF SERVICE -->
     <bean id="personRepository" class="com.mhallman.camel_jaxrs.repository.PersonRepositoryImpl" />
-	<!-- <bean id="personService" class="com.mhallman.camel_jaxrs.service.PersonService">
-		<property name="personRepository" ref="personRepository"></property>
-	</bean>!-->
 	
 	<!-- CREATE BEAN FROM PERSONROUTE CLASS THAT EXTENDS ROUTEBUILDER -->
 	<bean id="personRoute" class="com.mhallman.camel_jaxrs.route.PersonRoute" />
 	<bean id="personRoute2" class="com.mhallman.camel_jaxrs.route.PersonRoute2" />
-	<!-- <bean id="jsonProvider" class="org.apache.cxf.jaxrs.provider.json.JSONProvider"/>!-->
 	
-	<!-- ><jaxrs:server id="myserver" address="http://localhost:8085/camel_jaxrs/rest">
-		<jaxrs:serviceBeans>
-			<ref bean="personService" />
-		</jaxrs:serviceBeans>
-	</jaxrs:server>!-->
+	<!-- CREATE BEAN FOR PERSON PROCESSOR -->
+	<bean id="personProcessor" class="com.mhallman.camel_jaxrs.processor.PersonProcessor" />
+	
 	
 	<cxf:rsServer id="rsServer" address="http://localhost:8085/camel_jaxrs/rest">
 		<cxf:serviceBeans>
 			<ref bean="personService"/>
 		</cxf:serviceBeans>
+		<cxf:providers>
+			<bean class="org.codehaus.jackson.jaxrs.JacksonJsonProvider"/>
+		</cxf:providers>
 	</cxf:rsServer>
 	
 	
@@ -56,13 +53,20 @@
 			<to uri="file:D:/camel/output" />
 		</route>
 		<route>
-       <!-- Just need to ignoreDeleteMethodMessageBody -->
-       <from uri="cxfrs:bean:rsServer?bindingStyle=SimpleConsumer"/>
+	       <!-- Just need to ignoreDeleteMethodMessageBody -->
+	       <from uri="cxfrs:bean:rsServer?bindingStyle=SimpleConsumer"/>
 	       <to uri="log:body?level=INFO"/>
 	       <recipientList>
                 <simple>direct:${header.operationName}</simple>
             </recipientList>
 	    </route>
+	    
+	    <route>
+	    	<from uri="direct:camelRoute"/>
+	    	<process ref="personProcessor" />
+	    	<to uri="log:body?level=INFO" />
+	    </route>
+
 	</camelContext>
 	
 	

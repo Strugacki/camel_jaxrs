@@ -1,14 +1,18 @@
 package com.mhallman.camel_jaxrs.domain;
 
+import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;
 
 @XmlRootElement
 public class Person {
 
+
 	String firstName;
+
 
 	String lastName;
 	
+
 	int age;
 	
 	public String getFirstName() {

@@ -4,7 +4,7 @@ import org.springframework.stereotype.Service;
 
 import com.mhallman.camel_jaxrs.domain.Person;
 
-
+@Service
 public class PersonRepositoryImpl implements PersonRepository {
 
 	@Override
